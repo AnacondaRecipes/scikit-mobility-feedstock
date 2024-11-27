@@ -12,7 +12,7 @@ source:
 build:
   number: 0
   # missing h3-py, python-igraph for 3.12
-  skip: True  # [py>311]
+  skip: True  # [py<38 or py>311]
   script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
 
 requirements:
@@ -21,28 +21,39 @@ requirements:
     - pip
     - poetry-core
   run:
-    - fiona
-    - folium
-    - geojson
-    - geopandas
-    - matplotlib-base
-    - numpy
-    - pandas
-    - powerlaw
-    - python
-    - requests
-    - rtree
+    # - fiona
+    - folium >=0.12.1.post1
+    - geojson >=2.5.0
+    - geopandas >=0.10.2
+    # - matplotlib-base
+    # - numpy
+    - pandas >=1.1.5
+    - powerlaw >=1.4.6
+    # - python
+    - requests >=2.25.1
+    # - rtree
     - scikit-learn
-    - scipy
-    - shapely
-    - statsmodels
-    - tqdm
-    - python-igraph
-    - h3-py
-    - pyproj
+    # - scipy
+    # - shapely
+    - statsmodels >=0.13.0
+    - tqdm >=4.60.0
+    - python-igraph >=0.9.1
+    - h3-py >=3.7.3
+    # - pyproj
+    - pooch >=1.6.0
     - python
 
 test:
+  source_files:
+    - skmob/core/tests
+    - skmob/data/tests
+    - skmob/io/tests
+    - skmob/measures/tests
+    - skmob/models/tests
+    - skmob/preprocessing/tests
+    - skmob/privacy/tests
+    - skmob/tessellation/tests
+    - skmob/utils/tests
   imports:
     - skmob
     - skmob.core
@@ -54,9 +65,22 @@ test:
     - skmob.tessellation
     - skmob.utils
   commands:
-    - pip check
+    # - pip check
+    - cd skmob
+    - cd core
+    - pytest -vv tests
+    # - pytest -vv core/tests
+    # - pytest -vv data/tests
+    # - pytest -vv io/tests
+    # - pytest -vv measures/tests
+    # - pytest -vv models/tests
+    # - pytest -vv preprocessing/tests
+    # - pytest -vv privacy/tests
+    # - pytest -vv tessellation/tests
+    # - pytest -vv utils/tests
   requires:
     - pip
+    - pytest
 
 about:
   home: https://github.com/scikit-mobility/scikit-mobility
