@@ -53,9 +53,14 @@ test:
     - skmob.privacy
     - skmob.tessellation
     - skmob.utils
+  commands:
+    - pip check
+  requires:
+    - pip
 
 about:
   home: https://github.com/scikit-mobility/scikit-mobility
+  dev_url: https://github.com/scikit-mobility/scikit-mobility
   license: BSD-3-Clause
   license_family: BSD
   license_file: LICENSE
