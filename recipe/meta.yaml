@@ -9,17 +9,17 @@ source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
   sha256: 1e4c4a229044953c5740c31f1f9b38df01420f595d11c22c9d106845d6b5e1d3
 
-
 build:
-  noarch: python
   number: 0
-  script: {{ PYTHON }} -m pip install . -vv
+  # missing h3-py, python-igraph for 3.12
+  skip: True  # [py>311]
+  script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
 
 requirements:
   host:
-    - python >=3.6
+    - python
     - pip
-    - poetry
+    - poetry-core
   run:
     - fiona
     - folium
@@ -40,7 +40,7 @@ requirements:
     - python-igraph
     - h3-py
     - pyproj
-    - python >=3.6
+    - python
 
 test:
   imports:
@@ -56,10 +56,9 @@ test:
 
 about:
   home: https://github.com/scikit-mobility/scikit-mobility
-
   license: BSD-3-Clause
   license_family: BSD
-  license_file: LICENSE.txt
+  license_file: LICENSE
   summary: A toolbox for analyzing and processing mobility data.
   description: |
     scikit-mobility is a library for human mobility analysis in Python. The library allows to: (i) represent trajectories and mobility flows with 
