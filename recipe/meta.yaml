@@ -18,7 +18,7 @@ source:
 build:
   number: 0
   # missing h3-py, python-igraph for 3.12
-  skip: True  # [py<38 or py>311]
+  skip: True  # [py<38 or py>311 or s390x]
   script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
 
 requirements:
