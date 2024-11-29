@@ -1,0 +1,22 @@
+diff --git a/skmob/utils/tests/test_plots.py b/skmob/utils/tests/test_plots.py
+index 1fabd11..dc45cca 100644
+--- a/skmob/utils/tests/test_plots.py
++++ b/skmob/utils/tests/test_plots.py
+@@ -151,7 +151,7 @@ def test_plot_diary(tdf, user, start_datetime):
+     cstdf = clustering.cluster(stdf)
+     ax = plot.plot_diary(cstdf, user, start_datetime=start_datetime)
+ 
+-    assert isinstance(ax, matplotlib.axes._subplots.Subplot)
++    assert isinstance(ax, matplotlib.axes.Subplot)
+ 
+ 
+ @pytest.mark.parametrize('tdf', [tdf_test])
+@@ -162,7 +162,7 @@ def test_plot_diary(tdf, user, start_datetime):
+     cstdf = clustering.cluster(stdf)
+     ax = cstdf.plot_diary(user, start_datetime=start_datetime)
+ 
+-    assert isinstance(ax, matplotlib.axes._subplots.Subplot)
++    assert isinstance(ax, matplotlib.axes.Subplot)
+ 
+ 
+ # plot_flows
