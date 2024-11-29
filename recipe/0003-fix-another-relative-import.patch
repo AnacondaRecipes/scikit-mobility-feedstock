@@ -1,0 +1,13 @@
+diff --git a/skmob/utils/tests/test_plots.py b/skmob/utils/tests/test_plots.py
+index 307aba5..1fabd11 100644
+--- a/skmob/utils/tests/test_plots.py
++++ b/skmob/utils/tests/test_plots.py
+@@ -4,7 +4,7 @@ import geopandas as gpd
+ import shapely
+ import pytest
+ from skmob.core.trajectorydataframe import TrajDataFrame, FlowDataFrame
+-from .. import plot
++from skmob.utils import plot
+ from skmob.utils import constants
+ from skmob.preprocessing import detection, clustering
+ import folium

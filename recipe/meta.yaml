@@ -8,6 +8,12 @@ package:
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
   sha256: 1e4c4a229044953c5740c31f1f9b38df01420f595d11c22c9d106845d6b5e1d3
+  patches:
+    - 0001-replace-relative-imports-with-module.patch
+    - 0002-fix-matplotlib-axes-subplot.patch
+    - 0003-fix-another-relative-import.patch
+    - 0004-fix-more-matplotlib-axes-subplot.patch
+    - 0005-remove-upper-bounds-from-setup-py.patch
 
 build:
   number: 0
@@ -16,30 +22,32 @@ build:
   script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
 
 requirements:
+  build:
+    - patch  # [not win]
+    - m2-patch  # [win]
   host:
     - python
     - pip
     - poetry-core
   run:
-    # - fiona
+    - fiona
     - folium >=0.12.1.post1
     - geojson >=2.5.0
     - geopandas >=0.10.2
-    # - matplotlib-base
-    # - numpy
-    - pandas >=1.1.5
+    - matplotlib-base
+    - numpy
+    - pandas >=1.1.5,<2.0.0
     - powerlaw >=1.4.6
-    # - python
     - requests >=2.25.1
-    # - rtree
+    # - rtree # cf
     - scikit-learn
-    # - scipy
-    # - shapely
+    - scipy
+    - shapely
     - statsmodels >=0.13.0
     - tqdm >=4.60.0
     - python-igraph >=0.9.1
     - h3-py >=3.7.3
-    # - pyproj
+    - pyproj
     - pooch >=1.6.0
     - python
 
@@ -47,7 +55,7 @@ test:
   source_files:
     - skmob/core/tests
     - skmob/data/tests
-    - skmob/io/tests
+    # - skmob/io/tests # is empty
     - skmob/measures/tests
     - skmob/models/tests
     - skmob/preprocessing/tests
@@ -65,22 +73,21 @@ test:
     - skmob.tessellation
     - skmob.utils
   commands:
-    # - pip check
+    - pip check
     - cd skmob
-    - cd core
-    - pytest -vv tests
-    # - pytest -vv core/tests
-    # - pytest -vv data/tests
-    # - pytest -vv io/tests
-    # - pytest -vv measures/tests
-    # - pytest -vv models/tests
-    # - pytest -vv preprocessing/tests
-    # - pytest -vv privacy/tests
-    # - pytest -vv tessellation/tests
-    # - pytest -vv utils/tests
+    - pytest -vv -k "not test_versions_are_in_sync" core/tests
+    - pytest -vv data/tests
+    - pytest -vv measures/tests
+    - pytest -vv models/tests
+    - pytest -vv preprocessing/tests
+    - pytest -vv privacy/tests
+    # skipped tests are using requests.get to download data from nominatim.openstreetmap.org, some of which is unavaliable
+    - pytest -vv -k "not (test_tiler_get or test__str_to_geometry)" tessellation/tests
+    - pytest -vv utils/tests
   requires:
     - pip
     - pytest
+    - toml
 
 about:
   home: https://github.com/scikit-mobility/scikit-mobility
