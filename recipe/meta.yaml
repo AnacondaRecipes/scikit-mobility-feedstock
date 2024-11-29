@@ -9,11 +9,12 @@ source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
   sha256: 1e4c4a229044953c5740c31f1f9b38df01420f595d11c22c9d106845d6b5e1d3
   patches:
-    - 0001-replace-relative-imports-with-module.patch
-    - 0002-fix-matplotlib-axes-subplot.patch
-    - 0003-fix-another-relative-import.patch
-    - 0004-fix-more-matplotlib-axes-subplot.patch
-    - 0005-remove-upper-bounds-from-setup-py.patch
+    - patches/0001-replace-relative-imports-with-module.patch
+    - patches/0002-fix-matplotlib-axes-subplot.patch
+    - patches/0003-fix-another-relative-import.patch
+    - patches/0004-fix-more-matplotlib-axes-subplot.patch
+    - patches/0005-remove-upper-bounds-from-setup-py.patch
+    - patches/0006-remove-upper-bounds-from-pyproject-toml.patch
 
 build:
   number: 0
@@ -39,7 +40,6 @@ requirements:
     - pandas >=1.1.5,<2.0.0
     - powerlaw >=1.4.6
     - requests >=2.25.1
-    # - rtree # cf
     - scikit-learn
     - scipy
     - shapely
@@ -55,7 +55,6 @@ test:
   source_files:
     - skmob/core/tests
     - skmob/data/tests
-    # - skmob/io/tests # is empty
     - skmob/measures/tests
     - skmob/models/tests
     - skmob/preprocessing/tests
