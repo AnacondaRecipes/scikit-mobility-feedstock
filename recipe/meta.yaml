@@ -31,6 +31,8 @@ requirements:
     - pip
     - poetry-core
   run:
+    # There are more runtime dependencies here because the upstream forgot many
+    # that are used in the source code. Also conda-forge had to do a similar list.
     - fiona
     - folium >=0.12.1.post1
     - geojson >=2.5.0
