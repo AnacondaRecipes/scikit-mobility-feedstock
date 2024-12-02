@@ -8,41 +8,61 @@ package:
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
   sha256: 1e4c4a229044953c5740c31f1f9b38df01420f595d11c22c9d106845d6b5e1d3
-
+  patches:
+    - patches/0001-replace-relative-imports-with-module.patch
+    - patches/0002-fix-matplotlib-axes-subplot.patch
+    - patches/0003-fix-another-relative-import.patch
+    - patches/0004-fix-more-matplotlib-axes-subplot.patch
+    - patches/0005-remove-upper-bounds-from-setup-py.patch
+    - patches/0006-remove-upper-bounds-from-pyproject-toml.patch
 
 build:
-  noarch: python
   number: 0
-  script: {{ PYTHON }} -m pip install . -vv
+  # missing h3-py, python-igraph for 3.12
+  skip: True  # [py<38 or py>311 or s390x]
+  script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
 
 requirements:
+  build:
+    - patch  # [not win]
+    - m2-patch  # [win]
   host:
-    - python >=3.6
+    - python
     - pip
-    - poetry
+    - poetry-core
   run:
+    # There are more runtime dependencies here because the upstream forgot many
+    # that are used in the source code. Also conda-forge had to do a similar list.
     - fiona
-    - folium
-    - geojson
-    - geopandas
+    - folium >=0.12.1.post1
+    - geojson >=2.5.0
+    - geopandas >=0.10.2
     - matplotlib-base
     - numpy
-    - pandas
-    - powerlaw
-    - python
-    - requests
-    - rtree
+    - pandas >=1.1.5,<2.0.0
+    - powerlaw >=1.4.6
+    - requests >=2.25.1
     - scikit-learn
     - scipy
     - shapely
-    - statsmodels
-    - tqdm
-    - python-igraph
-    - h3-py
+    - statsmodels >=0.13.0
+    - tqdm >=4.60.0
+    - python-igraph >=0.9.1
+    - h3-py >=3.7.3
     - pyproj
-    - python >=3.6
+    - pooch >=1.6.0
+    - python
 
 test:
+  source_files:
+    - skmob/core/tests
+    - skmob/data/tests
+    - skmob/measures/tests
+    - skmob/models/tests
+    - skmob/preprocessing/tests
+    - skmob/privacy/tests
+    - skmob/tessellation/tests
+    - skmob/utils/tests
   imports:
     - skmob
     - skmob.core
@@ -53,13 +73,29 @@ test:
     - skmob.privacy
     - skmob.tessellation
     - skmob.utils
+  commands:
+    - pip check
+    - cd skmob
+    - pytest -vv -k "not test_versions_are_in_sync" core/tests
+    - pytest -vv data/tests
+    - pytest -vv measures/tests
+    - pytest -vv models/tests
+    - pytest -vv preprocessing/tests
+    - pytest -vv privacy/tests
+    # skipped tests are using requests.get to download data from nominatim.openstreetmap.org, some of which is unavaliable
+    - pytest -vv -k "not (test_tiler_get or test__str_to_geometry)" tessellation/tests
+    - pytest -vv utils/tests
+  requires:
+    - pip
+    - pytest
+    - toml
 
 about:
   home: https://github.com/scikit-mobility/scikit-mobility
-
+  dev_url: https://github.com/scikit-mobility/scikit-mobility
   license: BSD-3-Clause
   license_family: BSD
-  license_file: LICENSE.txt
+  license_file: LICENSE
   summary: A toolbox for analyzing and processing mobility data.
   description: |
     scikit-mobility is a library for human mobility analysis in Python. The library allows to: (i) represent trajectories and mobility flows with 
