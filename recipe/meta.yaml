@@ -17,52 +17,51 @@ source:
     - patches/0006-remove-upper-bounds-from-pyproject-toml.patch
 
 build:
-  number: 0
+  number: 1
   # missing h3-py, python-igraph for 3.12
-  skip: True  # [py<38 or py>311 or s390x]
+  skip: True  # [py<38 or py>311]
   script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
 
 requirements:
-  build:
-    - patch  # [not win]
-    - m2-patch  # [win]
   host:
     - python
     - pip
-    - poetry-core
+    - wheel
+    - setuptools >=54.1.2
+    - poetry-core >=1.0
   run:
+    - python
     # There are more runtime dependencies here because the upstream forgot many
     # that are used in the source code. Also conda-forge had to do a similar list.
-    - fiona
     - folium >=0.12.1.post1
-    - geojson >=2.5.0
-    - geopandas >=0.10.2
+    # AttributeError: module 'fiona' has no attribute 'path'
+    - fiona <1.10.0
+    # upstream geojson >=2.5.0,<3.0.0, available 3.1.0
+    - geojson >=2.5.0,<=3.1.0
+    # upstream geopandas >=0.10.2,<0.11.0, available from 0.14.2
+    - geopandas >=0.10.2,<=0.14.2
     - matplotlib-base
     - numpy
     - pandas >=1.1.5,<2.0.0
-    - powerlaw >=1.4.6
-    - requests >=2.25.1
+    - powerlaw >=1.4.6,<2
+    - requests >=2.25.1,<3.0.0
     - scikit-learn
     - scipy
-    - shapely
-    - statsmodels >=0.13.0
-    - tqdm >=4.60.0
-    - python-igraph >=0.9.1
-    - h3-py >=3.7.3
+    # https://github.com/scikit-mobility/scikit-mobility/issues/293
+    - shapely <2.1.0
+    - statsmodels >=0.13.0,<0.14.0
+    - tqdm >=4.60.0,<5.0.0
+    - python-igraph >=0.9.1,<1
+    - h3-py >=3.7.3,<4.0.0
     - pyproj
-    - pooch >=1.6.0
-    - python
+    - pooch >=1.6.0,<2.0.0
 
 test:
   source_files:
-    - skmob/core/tests
-    - skmob/data/tests
-    - skmob/measures/tests
-    - skmob/models/tests
-    - skmob/preprocessing/tests
-    - skmob/privacy/tests
-    - skmob/tessellation/tests
-    - skmob/utils/tests
+    - pyproject.toml
+  files:
+    # snowflake request TEST
+    - tests/cascaded_union_test.py
   imports:
     - skmob
     - skmob.core
@@ -75,20 +74,19 @@ test:
     - skmob.utils
   commands:
     - pip check
-    - cd skmob
-    - pytest -vv -k "not test_versions_are_in_sync" core/tests
-    - pytest -vv data/tests
-    - pytest -vv measures/tests
-    - pytest -vv models/tests
-    - pytest -vv preprocessing/tests
-    - pytest -vv privacy/tests
-    # skipped tests are using requests.get to download data from nominatim.openstreetmap.org, some of which is unavaliable
-    - pytest -vv -k "not (test_tiler_get or test__str_to_geometry)" tessellation/tests
-    - pytest -vv utils/tests
+    # WARNINGS: 
+    # - ShapelyDeprecationWarning: The 'cascaded_union()' function is deprecated. Use 'unary_union()' instead.
+    # - RuntimeWarning: invalid value encountered in unary_union
+    - pytest -v tests/cascaded_union_test.py
+    - cp pyproject.toml ${SP_DIR}/pyproject.toml  # [unix]
+    - cp pyproject.toml %SP_DIR%/pyproject.toml  # [win]
+    # E   tessellation = tilers.tiler.get(tiler_type, base_shape=base_shape, meters=meters)
+    # E   Wrong UTF codec detected; usually because it's not UTF-8
+    - pytest --pyargs skmob --deselect=tessellation/tests/test_tilers.py
   requires:
     - pip
-    - pytest
     - toml
+    - pytest >=6.2.4,<7
 
 about:
   home: https://github.com/scikit-mobility/scikit-mobility
